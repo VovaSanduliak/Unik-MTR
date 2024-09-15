@@ -1,6 +1,10 @@
 import './App.css'
-import {Button, NumberInput, Stack, Table, TextInput} from "@mantine/core";
 import {useEffect, useState} from "react";
+import {Button, NumberInput, Stack, Table, TextInput} from "@mantine/core";
+import ExpectationChart from './ExpectationChart.jsx';
+import DispersionChart from "./DispersionChart.jsx";
+import VariationCoeffChart from "./VariationCoeffChart.jsx";
+import {CartesianGrid, Legend, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis} from "recharts";
 
 const App = () => {
   const [variants, setVariants] = useState(
@@ -218,6 +222,47 @@ const App = () => {
           variant={"outline"}
           mt={10}>+</Button>
       </Stack>
+
+      <div style={{display: "flex"}}>
+        <ExpectationChart data={variants.map((variant, index) => ({
+          name: variant.name,
+          очікування: expectationValues[index],
+        }))}/>
+
+        <DispersionChart data={variants.map((variant, index) => ({
+          name: variant.name,
+          дисперсія: dispersionValues[index],
+        }))}/>
+
+        <VariationCoeffChart data={variants.map((variant, index) => ({
+          name: variant.name,
+          "коефіцієнти варіації": variationCoeffValues[index],
+        }))}/>
+      </div>
+
+      <div>
+        <ResponsiveContainer width="100%" height={400}>
+          <ScatterChart>
+            <CartesianGrid />
+            <XAxis type="number" dataKey="expectedProfit" name="Expected Profit" unit="$" />
+            <YAxis type="number" dataKey="risk" name="Risk (Variation Coefficient)" unit="" />
+            <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+            <Legend />
+            <Scatter
+              name="Варіанти інвестування"
+              data={
+                variants.map((variant, index) => (
+                  {
+                    name: variant.name,
+                    expectedProfit: expectationValues[index],
+                    risk: parseFloat(variationCoeffValues[index])
+                  }
+                ))
+              }
+              fill="#8884d8" />
+          </ScatterChart>
+        </ResponsiveContainer>
+      </div>
 
       {/*<Group justify="space-between" style={{margin: "10px 0 0 0"}}>*/}
       {/*  <div>*/}
